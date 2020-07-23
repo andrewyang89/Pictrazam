@@ -18,7 +18,7 @@ def generate_triplet_set(image_id, all_image_ids, cd):
     triplet_set : List[Tuple]
         10 triplets with good image descriptor, good caption, bad image descriptor
     """
-    d_good = resnet(image_id)  # get image descriptor vector given image id (name subject to change)
+    d_good = cd.imageID_to_descriptor[image_id]  # get image descriptor vector given image id (name subject to change)
     good_caption_ids = np.random.choice(cd.imageID_to_captionIDs[image_id], size = 10)  # Generate caption ids given image id (randomly choose one each time)
     all_w_good = [cd.captionID_to_embedding[cap_id] for cap_id in good_caption_ids]  # convert caption id to embeddings
     d_bad = []  # Final 10 bad image descriptors
@@ -27,9 +27,10 @@ def generate_triplet_set(image_id, all_image_ids, cd):
         other_img_id = np.random.choice(all_image_ids, size=25)  # Generate 25 random other image ids
         other_w = [cd.captionID_to_embedding[np.random.choice(cd.imageID_to_captionIDs[img_id])] for img_id in other_img_id] # Randomly pick caption given image id and get its embeddings
         w_bad_index = max([(w_good @ w_bad, i) for i, w_bad in enumerate(other_w)])[1]  # Dot product each other embedding with w_good, find biggest product, return that index
-        d_bad += [resnet(other_img_id[w_bad_index])]  # Using index above, get the appropriate image id that corresponds to the w_bad caption and get its descriptor vector
+        d_bad += [cd.imageID_to_descriptor[other_img_id[w_bad_index]]]  # Using index above, get the appropriate image id that corresponds to the w_bad caption and get its descriptor vector
     
     return list(zip([d_good] * 10, all_w_good, d_bad)) # Zip up d_good, w_good, d_bad - 10 len-3 tuples
+    
     
 def generate_triplets(cd):
     """
