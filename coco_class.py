@@ -19,9 +19,9 @@ class Coco:
         
         imageID_to_captionID: input image ID to output list of associated caption IDs
         
-        captionID_to_caption: input caption ID to ouput associated caption
+        captionID_to_caption: input caption ID to output associated caption
         
-        captionID_to_embedding: input caption ID to ouput associated embedding
+        captionID_to_embedding: input caption ID to output associated embedding
         
         
         Properties:
