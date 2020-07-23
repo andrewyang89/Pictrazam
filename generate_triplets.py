@@ -53,8 +53,8 @@ def generate_triplets(cd):
     idxs = np.arange(len(image_ids))  
     np.random.shuffle(idxs)  # Shuffle indices
     
-    train_img_ids = image_ids[idxs[:split_index]]  # Training set of image ids
-    val_img_ids = image_ids[idxs[split_index:]]  # Validation set of image ids
+    train_img_ids = [image_ids[x] for x in idxs[:split_index]]  # Training set of image ids
+    val_img_ids = [image_ids[x] for x in idxs[split_index:]]  # Validation set of image ids  
     
     train = []  # Instantiate Final List of Triplets for train data
     validation = []  # Instantiate Final List of Triplets for validation data
