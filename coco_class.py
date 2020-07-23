@@ -17,15 +17,21 @@ class Coco:
         
         imageID_to_url: input image ID and output URL
         
+        imageID_to_captionID: input image ID to output list of associated caption IDs
+        
         captionID_to_caption: input caption ID to ouput associated caption
         
         captionID_to_embedding: input caption ID to ouput associated embedding
         
+        
         Properties:
         -----------
         image_ids: all image IDs
+        
         caption_ids: all caption IDs
+        
         captions: all captions
+        
         urls: list of all URLs
         
         """
@@ -34,6 +40,7 @@ class Coco:
             data = json.load(json_file)
             
         self.imageID_to_captions = defaultdict(list)
+        self.imageID_to_captionID = defaultdict(list)
         
         # iterating through images
         
@@ -64,6 +71,6 @@ class Coco:
             self.captionID_to_caption[self.caption_ids[a]] = self.captions[a]
 #             self.captionID_to_embedding[self.caption_ids[a]] = embedding(self.captions[a])
             self.imageID_to_captions[self.image_ids_repetitions[a]].append(self.captions[a])        
-        
+            self.imageID_to_captionID[self.image_ids_repetitions[a]].append(self.caption_ids[a])
 
-
+            
