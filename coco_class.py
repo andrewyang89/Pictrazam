@@ -191,7 +191,7 @@ class Coco:
             documents in which the term `t` occurs.
         """
         N = len(counters)
-        nt = [doc_counter[k] for k in vocab]
+        nt = [counters[k] for k in vocab]
         nt = np.array(nt, dtype=float)
         return np.log10(N / (1+nt))
 
