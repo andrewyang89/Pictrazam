@@ -138,15 +138,17 @@ class Coco:
         all_vocab = sorted(doc_counter.keys())
 
 
-        all_idf = self.to_idf(len(self.captions), all_vocab, doc_counter)
+        word_to_idf = self.to_idf(len(self.captions), all_vocab, doc_counter)
 
 
         all_weights = np.zeros((len(captions), 50))
 
 
+       
+        
         for ind, caption in enumerate(captions): 
 
-            all_weights[ind] = self.embed_caption(caption,all_idf,all_vocab)
+            all_weights[ind] = self.embed_caption(caption, word_to_idf)
 
         return all_weights
     
