@@ -129,12 +129,16 @@ class Coco:
             Each row corresponds to a new caption. 
         """
 
-        all_counters = [self.to_counter(i) for i in captions]
+        all_counters = [to_counter(i) for i in captions]
 
-        all_vocab = self.to_vocab(all_counters)
+        doc_counter = Counter()
+        for caption in captions:
+            doc_counter.update(to_unique_words(caption))
+
+        all_vocab = sorted(doc_counter.keys())
 
 
-        all_idf = self.to_idf(all_vocab, all_counters)
+        all_idf = to_idf(all_vocab, doc_counter)
 
 
         all_weights = np.zeros((len(captions), 50))
@@ -142,7 +146,7 @@ class Coco:
 
         for ind, caption in enumerate(captions): 
 
-            all_weights[ind] = self.embed_caption(caption,all_idf,all_vocab)
+            all_weights[ind] = embed_caption(caption,all_idf,all_vocab)
 
         return all_weights
     
@@ -198,10 +202,9 @@ class Coco:
             documents in which the term `t` occurs.
         """
         N = len(counters)
-        nt = [sum(1 if t in counter else 0 for counter in counters) for t in vocab]
-        print('finished')
+        nt = [doc_counter[k] for k in vocab]
         nt = np.array(nt, dtype=float)
-        return np.log10(N / nt)
+        return np.log10(N / (nt+1))
     
     def strip_punc(self, corpus):
         punc_regex = re.compile('[{}]'.format(re.escape(string.punctuation)))
