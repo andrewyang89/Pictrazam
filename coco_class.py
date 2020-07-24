@@ -138,7 +138,7 @@ class Coco:
         all_vocab = sorted(doc_counter.keys())
 
 
-        all_idf = self.to_idf(len(self.captions)all_vocab, doc_counter)
+        all_idf = self.to_idf(len(self.captions), all_vocab, doc_counter)
 
 
         all_weights = np.zeros((len(captions), 50))
