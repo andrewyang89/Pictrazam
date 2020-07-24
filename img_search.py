@@ -1,7 +1,6 @@
 import numpy as np
-import CocoData as cd
 
-def img_search(k, query, id_to_semantic):
+def search(k, query, id_to_semantic):
     """
     Computes the cosine distance between the query embedding and all image
     embeddings
@@ -23,8 +22,7 @@ def img_search(k, query, id_to_semantic):
     ids = np.array(list(id_to_semantic.keys()))
     semantic_embs = np.swapaxes(np.array(list(id_to_semantic.values())), 0, 1)
 
-    cos = np.matmul(query, semantic_embs) / (np.linalg.norm(query) *
-          np.linalg.norm(semantic_embs))
+    cos = np.matmul(query, semantic_embs) / (query * semantic_embs)
 
     top_k = []
     for j in range(k):
