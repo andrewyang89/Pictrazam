@@ -1,4 +1,3 @@
-
 import json
 import numpy as np
 import re
@@ -126,11 +125,9 @@ class Coco:
         """ 
         Produce word-count of document, removing all punctuation
         and making all the characters lower-cased.
-
         Parameters
         ----------
         doc : str
-
         Returns
         -------
         collections.Counter
@@ -141,15 +138,12 @@ class Coco:
         """ 
         Takes in an iterable of multiple counters, and returns a sorted list of unique words 
         accumulated across all the counters
-
         [word_counter0, word_counter1, ...] -> sorted list of unique words
-
         Parameters
         ----------
         counters : Iterable[collections.Counter]
             An iterable containing {word -> count} counters for respective
             documents.
-
         Returns
         -------
         List[str]
@@ -163,15 +157,12 @@ class Coco:
         """ 
         Given the vocabulary, and the word-counts for each document, computes
         the inverse document frequency (IDF) for each term in the vocabulary.
-
         Parameters
         ----------
         vocab : Sequence[str]
             Ordered list of words that we care about.
-
         counters : Iterable[collections.Counter]
             The word -> count mapping for each document.
-
         Returns
         -------
         numpy.ndarray
@@ -195,4 +186,4 @@ class Coco:
         return self.strip_punc(doc).lower().split()
     
     def return_glove(self, word):
-        return self.glove[word] if word in self.glove else None
+        return self.glove[word] if word in self.glove
