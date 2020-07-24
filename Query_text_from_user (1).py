@@ -177,6 +177,9 @@ def query_text(all_idf, all_vocab):
         final_values[j] *= idf_values[j]
 
     W = np.sum(final_values, axis = 0)
+    
+    norm = np.linalg.norm(W)
+    W /= norm
 
     weights = W
     return weights
