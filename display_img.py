@@ -46,7 +46,7 @@ def display(img_ids: list, cd, cols=6, figsize=None):
 
     img_urls = []
     for id in img_ids:
-        img_urls.append(coco.imageID_to_url[id])
+        img_urls.append(cd.imageID_to_url[id])
 
     images = []
     for url in img_urls:
