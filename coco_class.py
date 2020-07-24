@@ -211,4 +211,4 @@ class Coco:
         return self.strip_punc(doc).lower().split()
     
     def return_glove(self, word):
-        return self.glove[word] if word in self.glove
+        return self.glove[word]
