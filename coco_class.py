@@ -129,7 +129,6 @@ class Coco:
             Each row corresponds to a new caption. 
         """
 
-        all_counters = [to_counter(i) for i in captions]
 
         doc_counter = Counter()
         for caption in captions:
@@ -150,18 +149,8 @@ class Coco:
 
         return all_weights
     
-    def to_counter(self, doc):
-        """ 
-        Produce word-count of document, removing all punctuation
-        and making all the characters lower-cased.
-        Parameters
-        ----------
-        doc : str
-        Returns
-        -------
-        collections.Counter
-            lower-cased word -> count"""
-        return Counter(self.strip_punc(doc).lower().split())
+    def to_unique_words(doc):
+        return set(strip_punc(doc).lower().split())
     
     def to_vocab(self, counters):
         """ 
