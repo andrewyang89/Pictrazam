@@ -1,6 +1,10 @@
 import numpy as np
+import pickle
 
-def generate_triplet_set(image_id, all_image_ids, cd):
+with open('resnet18_features.pkl', mode='rb') as file:
+    imgID_to_descriptor = pickle.load(file)
+
+def generate_triplet_set(image_id, cd):
     """
     Returns 10 triplets associated with a particular image id
     
@@ -18,17 +22,20 @@ def generate_triplet_set(image_id, all_image_ids, cd):
     triplet_set : List[Tuple]
         10 triplets with good image descriptor, good caption, bad image descriptor
     """
-    d_good = cd.imageID_to_descriptor[image_id]  # get image descriptor vector given image id (name subject to change)
-    good_caption_ids = np.random.choice(cd.imageID_to_captionIDs[image_id], size = 10)  # Generate caption ids given image id (randomly choose one each time)
+    if image_id in imgID_to_descriptor:
+        d_good = imgID_to_descriptor[image_id]  # get image descriptor vector given image id (name subject to change)
+    else:
+        return []
+    good_caption_ids = np.random.choice(cd.imageID_to_captionID[image_id], size = 10)  # Generate caption ids given image id (randomly choose one each time)
     all_w_good = [cd.captionID_to_embedding[cap_id] for cap_id in good_caption_ids]  # convert caption id to embeddings
     d_bad = []  # Final 10 bad image descriptors
-
+    
     for w_good in all_w_good:  # Iterate through each good caption to compare bad captions to
-        other_img_id = np.random.choice(all_image_ids, size=25)  # Generate 25 random other image ids
-        other_w = [cd.captionID_to_embedding[np.random.choice(cd.imageID_to_captionIDs[img_id])] for img_id in other_img_id] # Randomly pick caption given image id and get its embeddings
+        other_img_id = np.random.choice(list(set(imgID_to_descriptor.keys()) - {image_id}), size=25)  # Generate 25 random other image ids
+        other_w = [cd.captionID_to_embedding[np.random.choice(cd.imageID_to_captionID[img_id])] for img_id in other_img_id]  # Randomly pick caption given image id and get its embeddings
         w_bad_index = max([(w_good @ w_bad, i) for i, w_bad in enumerate(other_w)])[1]  # Dot product each other embedding with w_good, find biggest product, return that index
-        d_bad += [cd.imageID_to_descriptor[other_img_id[w_bad_index]]]  # Using index above, get the appropriate image id that corresponds to the w_bad caption and get its descriptor vector
-
+        d_bad += [imgID_to_descriptor[other_img_id[w_bad_index]]]
+    
     return list(zip([d_good] * 10, all_w_good, d_bad)) # Zip up d_good, w_good, d_bad - 10 len-3 tuples
 
 
@@ -50,17 +57,21 @@ def generate_triplets(cd):
     """
     image_ids = cd.image_ids  # Get all image ids (subject to change based on attribute name)
     split_index = 4 * len(image_ids) // 5  # Split data at this index to train and validation
-    idxs = np.arange(len(image_ids))
+    idxs = np.arange(len(image_ids))  
     np.random.shuffle(idxs)  # Shuffle indices
     
-    train_img_ids = [image_ids[x] for x in idxs[:split_index]]  # Training set of image ids
+    train_img_ids = [image_ids[x] for x in idxs[:split_index]]
     val_img_ids = [image_ids[x] for x in idxs[split_index:]]  # Validation set of image ids
     
     train = []  # Instantiate Final List of Triplets for train data
     validation = []  # Instantiate Final List of Triplets for validation data
-
-    for image_id in train_img_ids:  # Go through each Train image id
-        train += generate_triplet_set(image_id, list(set(train_img_ids) - {image_id}), cd)  # Generate and add triplet
-    for image_id in val_img_ids:
-        validation += generate_triplet_set(image_id, list(set(val_img_ids) - {image_id}), cd)
+    
+    print (len(train_img_ids))
+    for i, image_id in enumerate(train_img_ids[:100]):  # Go through each Train image id
+        train += generate_triplet_set(image_id, cd)  # Generate and add triplet
+    
+    print (len(val_img_ids))
+    for i, image_id in enumerate(val_img_ids[:100]):
+        validation += generate_triplet_set(image_id, cd)
+    
     return train, validation
