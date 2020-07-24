@@ -145,11 +145,11 @@ class Coco:
 
         for ind, caption in enumerate(captions): 
 
-            all_weights[ind] = embed_caption(caption,all_idf,all_vocab)
+            all_weights[ind] = self.embed_caption(caption,all_idf,all_vocab)
 
         return all_weights
     
-    def to_unique_words(doc):
+    def to_unique_words(self,doc):
         return set(strip_punc(doc).lower().split())
     
     def to_vocab(self, counters):
