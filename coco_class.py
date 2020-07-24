@@ -4,6 +4,7 @@ import numpy as np
 import re
 import string
 from collections import defaultdict, Counter
+from gensim.models.keyedvectors import KeyedVectors
 
 
 class Coco:
@@ -35,6 +36,8 @@ class Coco:
         urls: list of all URLs
         
         """
+        self.glove = KeyedVectors.load_word2vec_format('glove.6B.50d.txt.w2v', binary=False)
+        print ("glove loaded")
         
         with open('captions_train2014.json') as json_file:
             data = json.load(json_file)
@@ -76,6 +79,8 @@ class Coco:
         
         for a in range(len(data["annotations"])):
             self.captionID_to_embedding[self.caption_ids[a]] = self.caption_embeddings[a]
+        
+        
 
         
     def embed_caption(self, captions):
@@ -190,4 +195,4 @@ class Coco:
         return self.strip_punc(doc).lower().split()
     
     def return_glove(self, word):
-        return glove[word] if word in glove else None
+        return self.glove[word] if word in self.glove else None
