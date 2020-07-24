@@ -81,7 +81,7 @@ class Coco:
         
         
     
-    def embed_caption(self, caption, all_idf, all_vocab):
+    def embed_caption(self, caption, word_to_idf):
         words = self.divide_string(caption)
 
         N = len(words)
@@ -96,10 +96,11 @@ class Coco:
 
             if words[j] in self.glove:
 
-                idx = all_vocab.index(words[j])
-                idf_values[j] = all_idf[idx]
+
+                idf_values[j] = word_to_idf[words[j]]
 
                 words_glove[j] = self.return_glove(words[j])
+                
                 final_values[j] = words_glove[j] * idf_values[j]
 
 
@@ -137,7 +138,7 @@ class Coco:
         all_vocab = sorted(doc_counter.keys())
 
 
-        all_idf = self.to_idf(all_vocab, doc_counter)
+        all_idf = self.to_idf(len(self.captions)all_vocab, doc_counter)
 
 
         all_weights = np.zeros((len(captions), 50))
@@ -171,16 +172,19 @@ class Coco:
             vocab.update(counter)
         return sorted(vocab)
 
-    def to_idf(self, vocab, counters):
+    def to_idf(self, N, vocab, doc_counter):
         """ 
         Given the vocabulary, and the word-counts for each document, computes
         the inverse document frequency (IDF) for each term in the vocabulary.
         Parameters
         ----------
+        N: int
+            Length of Captions
         vocab : Sequence[str]
             Ordered list of words that we care about.
-        counters : Iterable[collections.Counter]
-            The word -> count mapping for each document.
+            
+        doc_counter : collections.Counter
+            The word -> count mapping across all documents.
         Returns
         -------
         numpy.ndarray
@@ -190,10 +194,8 @@ class Coco:
             Where `N` is the number of documents, and `nt` is the number of 
             documents in which the term `t` occurs.
         """
-        N = len(counters)
-        nt = [counters[k] for k in vocab]
-        nt = np.array(nt, dtype=float)
-        return np.log10(N / (1+nt))
+    
+        return {word: np.log10(N / (1+count)) for word, count in doc_counter.items()}
 
     def strip_punc(self, corpus):
         punc_regex = re.compile('[{}]'.format(re.escape(string.punctuation)))
