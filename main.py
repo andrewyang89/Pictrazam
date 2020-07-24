@@ -3,6 +3,7 @@ from coco_class import Coco
 from Query_text_from_user import query_text
 from img_search import search
 from display_img import display
+import numpy as np
 
 with open('embedding_database.pkl', mode='rb') as file:
     imgID_to_descriptor = pickle.load(file)
