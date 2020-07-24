@@ -71,7 +71,7 @@ def generate_triplets(cd):
     validation : List[Tuple]
         1/5 of data - triplets containing good image descriptor, good caption, bad image descriptor
     """
-    image_ids = list(imgID_to_descriptor.keys())  # Get all image ids (subject to change based on attribute name)
+    image_ids = list(imgID_to_descriptor.keys())[::10]  # Get all image ids (subject to change based on attribute name)
     split_index = 4 * len(image_ids) // 5  # Split data at this index to train and validation
     idxs = np.arange(len(image_ids))
     np.random.shuffle(idxs)  # Shuffle indices
