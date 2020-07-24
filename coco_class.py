@@ -74,50 +74,75 @@ class Coco:
             self.imageID_to_captions[self.image_ids_repetitions[a]].append(self.captions[a])        
             self.imageID_to_captionID[self.image_ids_repetitions[a]].append(self.caption_ids[a])
         
-        self.caption_embeddings = self.embed_caption(self.captions)
+        self.caption_embeddings = self.embed_captions(self.captions)
         
         for a in range(len(data["annotations"])):
             self.captionID_to_embedding[self.caption_ids[a]] = self.caption_embeddings[a]
         
         
-
-        
-    def embed_caption(self, captions):
-        print("began")
-        all_counters = [self.to_counter(i) for i in captions]
     
-        all_vocab = self.to_vocab(all_counters)
+    def embed_caption(self, caption, all_idf, all_vocab):
+        words = self.divide_string(caption)
 
-        all_idf = self.to_idf(all_vocab, all_counters)
+        N = len(words)
 
-        all_weights = np.zeros((len(captions), 50))
-        print("starting")
+        idf_values = np.zeros((N))
 
-        for ind, caption in enumerate(captions): 
-            words = self.divide_string(caption)
-            N = len(words)
-            idf_values = np.zeros((N))
+        words_glove = np.zeros((N, 50))
+        final_values = words_glove
 
 
-            for j in range(len(words)):
+        for j in range(len(words)):
+
+            if words[j] in self.glove:
+
                 idx = all_vocab.index(words[j])
                 idf_values[j] = all_idf[idx]
 
+                words_glove[j] = return_glove(words[j])
+                final_values[j] = words_glove[j] * idf_values[j]
 
-            words_glove = np.zeros((N, 50))
-            for j in range(len(words)):
-                #print(words[j])
-                words_glove[j] = self.return_glove(words[j])
 
-            final_values = words_glove
+        W = np.sum(final_values, axis = 0)
 
-            for j in range(N):
-                final_values[j] *= idf_values[j]
+        norm = np.linalg.norm(W)
 
-            W = np.sum(final_values, axis = 0)
+        W /= norm
+        return W
+    
+    
+        
+    def embed_captions(self,captions):
+        """
+        Given all the captions. This function will return the Glove embeddings weighted by the IDF for each caption.
 
-            all_weights[ind] = W
+        Parameters
+        ----------
+        captions : Sequence[str]
+            An iterable containing a strings that corresponds to captions.
 
+        Returns
+        -------
+
+        all_weights : np.ndarray - Shape(N, 50) - where N is number of captions
+            This contains each captions with the Glove embeddings weighted by the IDF.
+            Each row corresponds to a new caption. 
+        """
+
+        all_counters = [self.to_counter(i) for i in captions]
+
+        all_vocab = self.to_vocab(all_counters)
+
+
+        all_idf = self.to_idf(all_vocab, all_counters)
+
+
+        all_weights = np.zeros((len(captions), 50))
+
+
+        for ind, caption in enumerate(captions): 
+
+            all_weights[ind] = self.embed_caption(caption,all_idf,all_vocab)
 
         return all_weights
     
