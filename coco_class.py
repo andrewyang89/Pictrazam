@@ -132,7 +132,7 @@ class Coco:
 
         doc_counter = Counter()
         for caption in captions:
-            doc_counter.update(to_unique_words(caption))
+            doc_counter.update(self.to_unique_words(caption))
 
         all_vocab = sorted(doc_counter.keys())
 
