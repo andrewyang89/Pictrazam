@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[43]:
+# In[1]:
 
 
 from collections import defaultdict
@@ -18,24 +18,6 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 # In[2]:
 
 
-path = r"/Users/venkat_kannan/Documents/glove.6B.50d.txt.w2v"
-t0 = time.time()
-glove = KeyedVectors.load_word2vec_format(path, binary=False)
-t1 = time.time()
-print("elapsed %ss" % (t1 - t0))
-# 50d: elapsed 17.67420792579651s
-# 100d: 
-
-
-# In[44]:
-
-
-type(glove['pizza'])
-
-
-# In[45]:
-
-
 import re, string
 punc_regex = re.compile('[{}]'.format(re.escape(string.punctuation)))
 
@@ -43,14 +25,14 @@ def strip_punc(corpus):
     return punc_regex.sub('', corpus)
 
 
-# In[46]:
+# In[3]:
 
 
 def divide_string(doc):
     return strip_punc(doc).lower().split()
 
 
-# In[47]:
+# In[4]:
 
 
 def to_counter(doc):
@@ -69,7 +51,7 @@ def to_counter(doc):
     return Counter(strip_punc(doc).lower().split())
 
 
-# In[55]:
+# In[5]:
 
 
 def to_vocab(counters):
@@ -95,7 +77,7 @@ def to_vocab(counters):
     return sorted(vocab)
 
 
-# In[49]:
+# In[6]:
 
 
 def to_idf(vocab, counters):
@@ -126,73 +108,81 @@ def to_idf(vocab, counters):
     return np.log10(N / nt)
 
 
-# In[50]:
+# In[7]:
 
 
 def return_glove(word):
     return glove[word]
 
 
-# In[122]:
+# In[10]:
 
 
-def se_text(captions):
+def query_text(all_idf, all_vocab):
     """
-    Given all the captions. This function will return the Glove embeddings weighted by the IDF for each caption.
+    Returns the weighted query text. 
     
     Parameters
     ----------
-    captions : Sequence[str]
-        An iterable containing a strings that corresponds to captions.
+    
+    all_idf: np.ndarray
+        This contains all the IDF values for all 
+        vocab in the captions.
+        
+    all_vocab: List
+        This contains all the vocab in the captions
+        sorted alphabetically.
+        
     
     Returns
     -------
     
-    all_weights : np.ndarray - Shape(N, 50) - where N is number of captions
-        This contains each captions with the Glove embeddings weighted by the IDF.
-        Each row corresponds to a new caption. 
+    weights : np.ndarray - Shape(50,) - 
+        This contains text query weighted by GloVe embeddings
+        and IDF values. 
+
     """
+    text = input("Enter query text: ")
     
-    all_counters = [to_counter(i) for i in captions]
-    
-    all_vocab = to_vocab(all_counters)
-    
-    all_idf = to_idf(all_vocab, all_counters)
-    
-    all_weights = np.zeros((len(captions), 50))
+    counter = to_counter(text)
+    vocab = to_vocab(counter)
+
+    weights = np.zeros((1, 50))
     
     
-    for ind, caption in enumerate(captions): 
-        words = divide_string(caption)
-        N = len(words)
-        idf_values = np.zeros((N))
+    words = divide_string(text)
+    N = len(words)
+    idf_values = np.zeros((N))
+
+
+    for j in range(len(words)):
         
-        
-        for j in range(len(words)):
+        if words[j] in all_vocab:
+    
             idx = all_vocab.index(words[j])
+        
             idf_values[j] = all_idf[idx]
-            
-        
-        words_glove = np.zeros((N, 50))
-        for j in range(len(words)):
-            #print(words[j])
-            words_glove[j] = return_glove(words[j])
-        
-        final_values = words_glove
-        
-        for j in range(N):
-            final_values[j] *= idf_values[j]
-        
-        W = np.sum(final_values, axis = 0)
-        
-        norm = np.linalg.norm(W)
-        W /= norm
-        
-        all_weights[ind] = W
-        
-        
-    return all_weights
+        else:
+            idf_values[j] = 1
+
+
+    words_glove = np.zeros((N, 50))
+    for j in range(len(words)):
+
+        words_glove[j] = return_glove(words[j])
+
+    final_values = words_glove
+
+    for j in range(N):
+        final_values[j] *= idf_values[j]
+
+    W = np.sum(final_values, axis = 0)
     
+    norm = np.linalg.norm(W)
+    W /= norm
+
+    weights = W
+    return weights
 
 
 # In[ ]:
