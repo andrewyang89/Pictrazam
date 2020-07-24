@@ -99,7 +99,7 @@ class Coco:
                 idx = all_vocab.index(words[j])
                 idf_values[j] = all_idf[idx]
 
-                words_glove[j] = return_glove(words[j])
+                words_glove[j] = self.return_glove(words[j])
                 final_values[j] = words_glove[j] * idf_values[j]
 
 
