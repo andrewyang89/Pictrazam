@@ -185,6 +185,9 @@ def se_text(captions):
         
         W = np.sum(final_values, axis = 0)
         
+        norm = np.linalg.norm(W)
+        W /= norm
+        
         all_weights[ind] = W
         
         
