@@ -4,7 +4,6 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimage
 import math
-import CocoData
 
 __all__ = ["download_image"]
 
@@ -26,7 +25,7 @@ def download_image(img_url: str) -> Image:
     return Image.open(io.BytesIO(response.content))
 
 
-def display(img_ids: list, coco, cols=6, figsize=None):
+def display(img_ids: list, cd, cols=6, figsize=None):
     """ Fetches an image from the web.
 
     Parameters
@@ -34,8 +33,8 @@ def display(img_ids: list, coco, cols=6, figsize=None):
     img_ids : List[image IDs]
         List of respective image IDs to diplay.
 
-    coco : CocoData
-        CocoData instance.
+    cd : CocoDataClass
+        Coco data class containing image ID information
 
     cols : int
         Number of columns for the pictures to be displayed across (rows not
@@ -53,7 +52,7 @@ def display(img_ids: list, coco, cols=6, figsize=None):
     for url in img_urls:
         images.append(download_image(url))
 
-    rows = ciel(len(img_ids) / cols)
+    rows = ceil(len(img_ids) / cols)
     axes = []
     fig = plt.figure(figsize=figsize)
 
