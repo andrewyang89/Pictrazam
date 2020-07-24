@@ -4,7 +4,7 @@ import re
 import string
 from collections import defaultdict, Counter
 from gensim.models.keyedvectors import KeyedVectors
-
+from numba import jit
 
 class Coco:
     def __init__(self):
@@ -177,7 +177,7 @@ class Coco:
         for counter in counters:
             vocab.update(counter)
         return sorted(vocab)
-    
+
     def to_idf(self, vocab, counters):
         """ 
         Given the vocabulary, and the word-counts for each document, computes
@@ -201,7 +201,7 @@ class Coco:
         nt = [sum(1 if t in counter else 0 for counter in counters) for t in vocab]
         print('finished')
         nt = np.array(nt, dtype=float)
-        return np.log10(N / nt)
+        return np.log10(N / (1+nt))
     
     def strip_punc(self, corpus):
         punc_regex = re.compile('[{}]'.format(re.escape(string.punctuation)))

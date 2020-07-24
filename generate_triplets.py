@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import json
 
 with open('resnet18_features.pkl', mode='rb') as file:
     imgID_to_descriptor = pickle.load(file)
@@ -29,7 +30,7 @@ def generate_triplet_set(image_id, cd):
     good_caption_ids = np.random.choice(cd.imageID_to_captionID[image_id], size = 25)  # Generate caption ids given image id (randomly choose one each time)
     all_w_good = [cd.captionID_to_embedding[cap_id] for cap_id in good_caption_ids]  # convert caption id to embeddings
     d_bad = []  # Final 10 bad image descriptors
-    
+
 #     for w_good in all_w_good:  # Iterate through each good caption to compare bad captions to
 #         other_img_id = np.random.choice(list(set(imgID_to_descriptor.keys()) - {image_id}), size=25)  # Generate 25 random other image ids
 #         other_w = [cd.captionID_to_embedding[np.random.choice(cd.imageID_to_captionID[img_id])] for img_id in other_img_id]  # Randomly pick caption given image id and get its embeddings
@@ -72,7 +73,7 @@ def generate_triplets(cd):
     """
     image_ids = list(imgID_to_descriptor.keys())  # Get all image ids (subject to change based on attribute name)
     split_index = 4 * len(image_ids) // 5  # Split data at this index to train and validation
-    idxs = np.arange(len(image_ids))  
+    idxs = np.arange(len(image_ids))
     np.random.shuffle(idxs)  # Shuffle indices
     
     train_img_ids = [image_ids[x] for x in idxs[:split_index]]
@@ -80,19 +81,19 @@ def generate_triplets(cd):
     
     train = []  # Instantiate Final List of Triplets for train data
     validation = []  # Instantiate Final List of Triplets for validation data
-    
+
     print (len(train_img_ids))
     for i, image_id in enumerate(train_img_ids):  # Go through each Train image id
         if not i % 1000:
             print (i)
         train += generate_triplet_set(image_id, cd)  # Generate and add triplet
-    
+
     print (len(val_img_ids))
     for i, image_id in enumerate(val_img_ids):
         if not i % 1000:
             print (i)
         validation += generate_triplet_set(image_id, cd)
-    
+
     train_d_good = np.zeros((len(train), 512))
     for i in range(len(train)):
         train_d_good[i] = train[i][0].reshape(512)
@@ -116,3 +117,4 @@ def generate_triplets(cd):
     train = (train_d_good[::2], train_w_good[::2], train_d_bad[::2])
     validation = (val_d_good[::2], val_w_good[::2], val_d_bad[::2])
     return train, validation
+
