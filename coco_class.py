@@ -150,7 +150,7 @@ class Coco:
         return all_weights
     
     def to_unique_words(self,doc):
-        return set(strip_punc(doc).lower().split())
+        return set(self.strip_punc(doc).lower().split())
     
     def to_vocab(self, counters):
         """ 
