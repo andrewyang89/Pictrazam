@@ -97,7 +97,7 @@ class Coco:
             if words[j] in self.glove:
 
 
-                idf_values[j] = word_to_idf[words[j]]
+                idf_values[j] = self.word_to_idf[words[j]]
 
                 words_glove[j] = self.return_glove(words[j])
                 
@@ -138,7 +138,7 @@ class Coco:
         all_vocab = sorted(doc_counter.keys())
 
 
-        word_to_idf = self.to_idf(len(self.captions), all_vocab, doc_counter)
+        self.word_to_idf = self.to_idf(len(self.captions), all_vocab, doc_counter)
 
 
         all_weights = np.zeros((len(captions), 50))
@@ -148,7 +148,7 @@ class Coco:
         
         for ind, caption in enumerate(captions): 
 
-            all_weights[ind] = self.embed_caption(caption, word_to_idf)
+            all_weights[ind] = self.embed_caption(caption, self.word_to_idf)
 
         return all_weights
     
